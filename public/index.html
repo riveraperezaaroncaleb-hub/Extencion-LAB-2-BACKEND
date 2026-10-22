@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sistema de Control Escolar - Base de Datos Relacional</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@500;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-layout">
+    <!-- BARRA LATERAL (SIDEBAR) -->
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-icon">🎓</div>
+        <div class="brand-text">
+          <h2>SIGE Escolar</h2>
+          <span>Base de Datos 3FN</span>
+        </div>
+      </div>
+
+      <nav class="nav-menu">
+        <button class="nav-item active" data-tab="tab-dashboard" id="btn-nav-dashboard">
+          <span class="nav-icon">📊</span>
+          <span class="nav-label">Dashboard General</span>
+        </button>
+        <button class="nav-item" data-tab="tab-estudiantes" id="btn-nav-estudiantes">
+          <span class="nav-icon">👨‍🎓</span>
+          <span class="nav-label">Estudiantes</span>
+        </button>
+        <button class="nav-item" data-tab="tab-docentes" id="btn-nav-docentes">
+          <span class="nav-icon">👨‍🏫</span>
+          <span class="nav-label">Docentes & Cubículos</span>
+        </button>
+        <button class="nav-item" data-tab="tab-materias" id="btn-nav-materias">
+          <span class="nav-icon">📚</span>
+          <span class="nav-label">Materias & Prerrequisitos</span>
+        </button>
+        <button class="nav-item" data-tab="tab-cursos" id="btn-nav-cursos">
+          <span class="nav-icon">🏫</span>
+          <span class="nav-label">Cursos & Horarios</span>
+        </button>
+        <button class="nav-item" data-tab="tab-matriculas" id="btn-nav-matriculas">
+          <span class="nav-icon">📝</span>
+          <span class="nav-label">Matrículas & Calificaciones</span>
+        </button>
+        <button class="nav-item" data-tab="tab-biblioteca" id="btn-nav-biblioteca">
+          <span class="nav-icon">📖</span>
+          <span class="nav-label">Biblioteca (Restricciones)</span>
+        </button>
+        <button class="nav-item" data-tab="tab-sql" id="btn-nav-sql">
+          <span class="nav-icon">⚡</span>
+          <span class="nav-label">Laboratorio SQL en Vivo</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="db-status">
+          <span class="status-indicator online"></span>
+          <span>SQLite Relacional Activa</span>
+        </div>
+        <button class="btn btn-secondary btn-sm btn-block" id="btn-reset-db">
+          🔄 Reiniciar Datos Demo
+        </button>
+      </div>
+    </aside>
+
+    <!-- ÁREA PRINCIPAL DE CONTENIDO -->
+    <main class="main-content">
+      <!-- HEADER SUPERIOR -->
+      <header class="top-header">
+        <div class="header-title">
+          <h1 id="page-title">Dashboard General</h1>
+          <p id="page-subtitle">Monitoreo integral y control del modelo relacional escolar</p>
+        </div>
+        <div class="header-actions">
+          <button class="btn btn-primary" id="btn-header-action">+ Acción Rápida</button>
+        </div>
+      </header>
+
+      <!-- SECCIONES / PESTAÑAS -->
+      <div class="content-container">
+
+        <!-- 1. TAB DASHBOARD -->
+        <section id="tab-dashboard" class="tab-pane active">
+          <!-- KPI Cards -->
+          <div class="kpi-grid">
+            <div class="kpi-card glass">
+              <div class="kpi-icon blue">👨‍🎓</div>
+              <div class="kpi-info">
+                <span class="kpi-label">Estudiantes Inscritos</span>
+                <h3 class="kpi-value" id="kpi-estudiantes">--</h3>
+              </div>
+            </div>
+
+            <div class="kpi-card glass">
+              <div class="kpi-icon purple">👨‍🏫</div>
+              <div class="kpi-info">
+                <span class="kpi-label">Cuerpo Docente</span>
+                <h3 class="kpi-value" id="kpi-docentes">--</h3>
+              </div>
+            </div>
+
+            <div class="kpi-card glass">
+              <div class="kpi-icon green">📚</div>
+              <div class="kpi-info">
+                <span class="kpi-label">Asignaturas Ofertadas</span>
+                <h3 class="kpi-value" id="kpi-materias">--</h3>
+              </div>
+            </div>
+
+            <div class="kpi-card glass">
+              <div class="kpi-icon orange">🏫</div>
+              <div class="kpi-info">
+                <span class="kpi-label">Cursos Activos (2026-B)</span>
+                <h3 class="kpi-value" id="kpi-cursos">--</h3>
+              </div>
+            </div>
+
+            <div class="kpi-card glass">
+              <div class="kpi-icon teal">📝</div>
+              <div class="kpi-info">
+                <span class="kpi-label">Matrículas Totales</span>
+                <h3 class="kpi-value" id="kpi-matriculas">--</h3>
+              </div>
+            </div>
+
+            <div class="kpi-card glass">
+              <div class="kpi-icon red">📖</div>
+              <div class="kpi-info">
+                <span class="kpi-label">Libros no Devueltos</span>
+                <h3 class="kpi-value" id="kpi-prestamos">--</h3>
+              </div>
+            </div>
+          </div>
+
+          <!-- Paneles de Estadísticas e Integridad -->
+          <div class="dashboard-grid">
+            <div class="card glass">
+              <div class="card-header">
+                <h3>Aprovechamiento Académico</h3>
+                <span class="badge blue">Escala 0 - 10</span>
+              </div>
+              <div class="academic-stats">
+                <div class="grade-circle">
+                  <div class="grade-number" id="dash-promedio">--</div>
+                  <span class="grade-text">Promedio General</span>
+                </div>
+                <div class="grade-breakdown">
+                  <div class="breakdown-item">
+                    <span class="bullet approved"></span>
+                    <span>Alumnos Aprobados (≥ 7.0):</span>
+                    <strong id="dash-aprobados">--</strong>
+                  </div>
+                  <div class="breakdown-item">
+                    <span class="bullet failed"></span>
+                    <span>Alumnos Reprobados (&lt; 7.0):</span>
+                    <strong id="dash-reprobados">--</strong>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="card glass">
+              <div class="card-header">
+                <h3>Reglas de Integridad Activas</h3>
+                <span class="badge green">Modelo 3FN</span>
+              </div>
+              <ul class="rules-list">
+                <li><span class="rule-tag pk">PK</span> Llaves compuestas en matrículas para evitar doble inscripción.</li>
+                <li><span class="rule-tag fk">FK</span> Integridad referencial con eliminación en cascada en expedientes.</li>
+                <li><span class="rule-tag rest">RESTRICT</span> Bloqueo de baja a alumnos con préstamos de biblioteca.</li>
+                <li><span class="rule-tag check">CHECK</span> Restricción lógica en notas (0 a 10) y estados institucionales.</li>
+                <li><span class="rule-tag ref">REFLEXIVA</span> Prerrequisitos de materias vinculadas consigo mismas.</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <!-- 2. TAB ESTUDIANTES -->
+        <section id="tab-estudiantes" class="tab-pane">
+          <div class="table-controls">
+            <input type="text" id="search-estudiantes" class="input-search" placeholder="🔍 Buscar por nombre, matrícula o carrera...">
+            <button class="btn btn-primary" id="btn-nuevo-estudiante">+ Registrar Estudiante</button>
+          </div>
+
+          <div class="card glass table-card">
+            <div class="table-responsive">
+              <table class="data-table" id="tabla-estudiantes">
+                <thead>
+                  <tr>
+                    <th>Matrícula</th>
+                    <th>Estudiante</th>
+                    <th>Correo</th>
+                    <th>Carrera</th>
+                    <th>Expediente Médico (1:1)</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody id="tbody-estudiantes">
+                  <!-- Se llena dinámicamente -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- 3. TAB DOCENTES -->
+        <section id="tab-docentes" class="tab-pane">
+          <div class="table-controls">
+            <p class="section-desc">Profesores adscritos a departamentos con asignación de cubículos exclusivos (1:1).</p>
+            <button class="btn btn-primary" id="btn-nuevo-docente">+ Registrar Docente</button>
+          </div>
+          <div class="docentes-grid" id="grid-docentes">
+            <!-- Tarjetas de docentes dinámicas -->
+          </div>
+        </section>
+
+        <!-- 4. TAB MATERIAS -->
+        <section id="tab-materias" class="tab-pane">
+          <div class="table-controls">
+            <p class="section-desc">Malla curricular oficial. Demuestra la <strong>relación reflexiva</strong> de asignaturas que actúan como prerrequisito de otras.</p>
+            <button class="btn btn-primary" id="btn-nueva-materia">+ Nueva Materia</button>
+          </div>
+
+          <div class="card glass table-card">
+            <div class="table-responsive">
+              <table class="data-table" id="tabla-materias">
+                <thead>
+                  <tr>
+                    <th>Clave</th>
+                    <th>Nombre de la Asignatura</th>
+                    <th>Semestre</th>
+                    <th>Créditos</th>
+                    <th>Prerrequisito Obligatorio (Reflexivo)</th>
+                  </tr>
+                </thead>
+                <tbody id="tbody-materias">
+                  <!-- Se llena dinámicamente -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- 5. TAB CURSOS -->
+        <section id="tab-cursos" class="tab-pane">
+          <div class="table-controls">
+            <p class="section-desc">Oferta de materias programadas para impartirse en aulas, con profesor titular y horario.</p>
+            <button class="btn btn-primary" id="btn-nuevo-curso">+ Abrir Curso</button>
+          </div>
+          <div class="cursos-grid" id="grid-cursos">
+            <!-- Tarjetas de cursos dinámicas -->
+          </div>
+        </section>
+
+        <!-- 6. TAB MATRICULAS & CALIFICACIONES -->
+        <section id="tab-matriculas" class="tab-pane">
+          <div class="grid-two-columns">
+            <!-- Formulario Matricular -->
+            <div class="card glass">
+              <div class="card-header">
+                <h3>Inscribir Alumno a Curso (N:M)</h3>
+              </div>
+              <form id="form-matricula" class="app-form">
+                <div class="form-group">
+                  <label for="mat-estudiante">Seleccionar Estudiante:</label>
+                  <select id="mat-estudiante" class="form-control" required></select>
+                </div>
+                <div class="form-group">
+                  <label for="mat-curso">Seleccionar Curso Disponible:</label>
+                  <select id="mat-curso" class="form-control" required></select>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Inscribir a la Asignatura</button>
+              </form>
+            </div>
+
+            <!-- Formulario Calificar -->
+            <div class="card glass">
+              <div class="card-header">
+                <h3>Asentar Calificación (CHECK 0-10)</h3>
+              </div>
+              <form id="form-calificacion" class="app-form">
+                <div class="form-group">
+                  <label for="cal-matricula">Seleccionar Inscripción Activa:</label>
+                  <select id="cal-matricula" class="form-control" required></select>
+                </div>
+                <div class="form-row">
+                  <div class="form-group col-6">
+                    <label for="cal-nota">Calificación (0.00 - 10.00):</label>
+                    <input type="number" id="cal-nota" class="form-control" step="0.1" min="0" max="10" placeholder="Ej. 9.5" required>
+                  </div>
+                  <div class="form-group col-6">
+                    <label for="cal-tipo">Tipo de Evaluación:</label>
+                    <select id="cal-tipo" class="form-control">
+                      <option value="Ordinario">Ordinario</option>
+                      <option value="Extraordinario">Extraordinario</option>
+                      <option value="Titulo">Título de Suficiencia</option>
+                    </select>
+                  </div>
+                </div>
+                <button type="submit" class="btn btn-accent btn-block">Guardar Calificación Oficial</button>
+              </form>
+            </div>
+          </div>
+
+          <!-- Historial de Calificaciones -->
+          <div class="card glass table-card mt-24">
+            <div class="card-header">
+              <h3>Registro General de Evaluaciones</h3>
+            </div>
+            <div class="table-responsive">
+              <table class="data-table" id="tabla-calificaciones">
+                <thead>
+                  <tr>
+                    <th>Folio (UNIQUE)</th>
+                    <th>Estudiante</th>
+                    <th>Materia / Grupo</th>
+                    <th>Nota Oficial</th>
+                    <th>Tipo</th>
+                    <th>Fecha</th>
+                  </tr>
+                </thead>
+                <tbody id="tbody-calificaciones"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- 7. TAB BIBLIOTECA -->
+        <section id="tab-biblioteca" class="tab-pane">
+          <div class="banner-alert">
+            <div class="alert-icon">⚠️</div>
+            <div class="alert-text">
+              <strong>Demostración Práctica de Integridad Referencial (ON DELETE RESTRICT):</strong>
+              Los alumnos que tengan libros con estatus "Pendiente" no pueden ser eliminados del sistema. Si intentas borrar a dicho estudiante en la pestaña de Estudiantes, el motor de la base de datos abortará la transacción para proteger la regla de negocio.
+            </div>
+          </div>
+
+          <div class="card glass table-card mt-16">
+            <div class="card-header">
+              <h3>Préstamos Bibliotecarios Activos</h3>
+            </div>
+            <div class="table-responsive">
+              <table class="data-table" id="tabla-prestamos">
+                <thead>
+                  <tr>
+                    <th>ID Préstamo</th>
+                    <th>Título del Libro</th>
+                    <th>Estudiante Prestatario</th>
+                    <th>Límite de Devolución</th>
+                    <th>Estatus</th>
+                    <th>Acción</th>
+                  </tr>
+                </thead>
+                <tbody id="tbody-prestamos"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- 8. TAB LABORATORIO SQL -->
+        <section id="tab-sql" class="tab-pane">
+          <div class="sql-lab-grid">
+            <div class="card glass">
+              <div class="card-header">
+                <h3>Consola SQL en Tiempo Real</h3>
+                <span class="badge purple">Acceso Directo a la BD</span>
+              </div>
+              <p class="text-muted">Escribe cualquier consulta <code>SELECT</code> contra la base de datos real o haz clic en las consultas universitarias sugeridas:</p>
+              
+              <!-- Consultas rápidas -->
+              <div class="quick-queries">
+                <button class="btn-chip" data-query="1">Reporte Completo (6 JOINs)</button>
+                <button class="btn-chip" data-query="2">Malla y Prerrequisitos (SELF-JOIN)</button>
+                <button class="btn-chip" data-query="3">Promedios y Rendimiento (GROUP BY)</button>
+                <button class="btn-chip" data-query="4">Docentes sin Asignación (IS NULL)</button>
+                <button class="btn-chip" data-query="5">Verificar Libros no devueltos</button>
+              </div>
+
+              <div class="editor-container">
+                <textarea id="sql-editor" rows="6" placeholder="SELECT * FROM Estudiantes;"></textarea>
+              </div>
+
+              <div class="editor-actions">
+                <button class="btn btn-secondary" id="btn-limpiar-sql">Limpiar</button>
+                <button class="btn btn-primary" id="btn-ejecutar-sql">⚡ Ejecutar Consulta SQL</button>
+              </div>
+            </div>
+
+            <!-- Resultados -->
+            <div class="card glass">
+              <div class="card-header">
+                <h3>Resultado de la Consulta</h3>
+                <span id="sql-status" class="badge">Listo</span>
+              </div>
+              <div class="sql-results-container" id="sql-results">
+                <p class="placeholder-text">Presiona "Ejecutar Consulta SQL" para ver los registros tabulados aquí.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- MODAL: NUEVO ESTUDIANTE -->
+  <div class="modal-overlay" id="modal-estudiante">
+    <div class="modal-card glass">
+      <div class="modal-header">
+        <h3>Registrar Nuevo Estudiante</h3>
+        <button class="modal-close" data-close="modal-estudiante">&times;</button>
+      </div>
+      <form id="form-estudiante" class="app-form">
+        <div class="form-row">
+          <div class="form-group col-6">
+            <label for="est-nombre">Nombre(s):</label>
+            <input type="text" id="est-nombre" class="form-control" required placeholder="Ej. Ana">
+          </div>
+          <div class="form-group col-6">
+            <label for="est-apellido">Apellido(s):</label>
+            <input type="text" id="est-apellido" class="form-control" required placeholder="Ej. Gómez">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group col-6">
+            <label for="est-curp">CURP o DNI (UNIQUE):</label>
+            <input type="text" id="est-curp" class="form-control" required placeholder="Ej. CURP200605XYZ">
+          </div>
+          <div class="form-group col-6">
+            <label for="est-correo">Correo Institucional (UNIQUE):</label>
+            <input type="email" id="est-correo" class="form-control" required placeholder="ana.gomez@universidad.edu">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group col-6">
+            <label for="est-fecha">Fecha de Nacimiento:</label>
+            <input type="date" id="est-fecha" class="form-control" required value="2005-01-01">
+          </div>
+          <div class="form-group col-6">
+            <label for="est-carrera">Carrera:</label>
+            <select id="est-carrera" class="form-control" required></select>
+          </div>
+        </div>
+
+        <h4 class="form-section-title">Expediente Médico (Relación 1:1)</h4>
+        <div class="form-row">
+          <div class="form-group col-4">
+            <label for="est-sangre">Tipo de Sangre:</label>
+            <select id="est-sangre" class="form-control">
+              <option value="O+">O+</option>
+              <option value="O-">O-</option>
+              <option value="A+">A+</option>
+              <option value="A-">A-</option>
+              <option value="B+">B+</option>
+              <option value="AB+">AB+</option>
+            </select>
+          </div>
+          <div class="form-group col-8">
+            <label for="est-alergias">Alergias Conocidas:</label>
+            <input type="text" id="est-alergias" class="form-control" placeholder="Ej. Penicilina o Ninguna">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group col-6">
+            <label for="est-contacto">Contacto de Emergencia:</label>
+            <input type="text" id="est-contacto" class="form-control" placeholder="Ej. María Gómez (Madre)" required>
+          </div>
+          <div class="form-group col-6">
+            <label for="est-tel">Teléfono de Emergencia:</label>
+            <input type="tel" id="est-tel" class="form-control" placeholder="Ej. 555-888-9999" required>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-close="modal-estudiante">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Guardar Estudiante</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: NUEVO DOCENTE -->
+  <div class="modal-overlay" id="modal-docente">
+    <div class="modal-card glass">
+      <div class="modal-header">
+        <h3>Registrar Docente y Cubículo</h3>
+        <button class="modal-close" data-close="modal-docente">&times;</button>
+      </div>
+      <form id="form-docente" class="app-form">
+        <div class="form-row">
+          <div class="form-group col-6">
+            <label for="doc-nombre">Nombre:</label>
+            <input type="text" id="doc-nombre" class="form-control" required>
+          </div>
+          <div class="form-group col-6">
+            <label for="doc-apellido">Apellido:</label>
+            <input type="text" id="doc-apellido" class="form-control" required>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group col-6">
+            <label for="doc-correo">Correo:</label>
+            <input type="email" id="doc-correo" class="form-control" required>
+          </div>
+          <div class="form-group col-6">
+            <label for="doc-esp">Especialidad:</label>
+            <input type="text" id="doc-esp" class="form-control" required placeholder="Ej. Inteligencia Artificial">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group col-6">
+            <label for="doc-dep">Departamento:</label>
+            <select id="doc-dep" class="form-control" required></select>
+          </div>
+          <div class="form-group col-6">
+            <label for="doc-coord">Coordinador (Reflexivo):</label>
+            <select id="doc-coord" class="form-control"></select>
+          </div>
+        </div>
+        <h4 class="form-section-title">Cubículo Exclusivo (1:1)</h4>
+        <div class="form-row">
+          <div class="form-group col-6">
+            <label for="doc-cub-edif">Edificio:</label>
+            <input type="text" id="doc-cub-edif" class="form-control" placeholder="Edificio Alpha">
+          </div>
+          <div class="form-group col-6">
+            <label for="doc-cub-num">Número Puerta:</label>
+            <input type="text" id="doc-cub-num" class="form-control" placeholder="C-305">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-close="modal-docente">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Registrar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- NOTIFICACIONES TOAST -->
+  <div id="toast-container"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
